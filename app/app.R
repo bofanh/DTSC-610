@@ -21,7 +21,7 @@ library("RSocrata")
 #     password  = "Ilovecoding1"
 # )
 
-
+library(DT) # library to display datatable
 
 
 # Define UI for application that draws a histogram
@@ -51,12 +51,9 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                 )
                 ),    
                 #########page 2##########
-                tabPanel("Page 2",
-                         
-                         # Show a plot of the generated distribution
-                         mainPanel(
-                             plotOutput("distPlot")
-                         )
+                tabPanel("The Datasets",
+                         h2("The CDC data"),
+                         DT::dataTableOutput("mytable")
                 ),
                 
                 #########page Read Me##########
@@ -75,6 +72,11 @@ server <- function(input, output) {
 
         # draw the histogram with the specified number of bins
         hist(x, breaks = bins, col = 'darkgray', border = 'white')
+        
+        # render the table set 
+        output$mytable = DT::renderDataTable({
+            df
+        })
     })
 }
 
