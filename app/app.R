@@ -59,13 +59,8 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                          )
                 ),
                 
-                #########page 3##########
-                tabPanel("Page 3",
-                         
-                         # Show a plot of the generated distribution
-                         mainPanel(
-                             plotOutput("distPlot")
-                         )
+                #########page Read Me##########
+                tabPanel("Read Me",includeMarkdown("../readme.md")
                 ),
                          
                 
