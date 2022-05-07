@@ -9,29 +9,67 @@
 
 library(shiny)
 
+## Install the required package with:
+## install.packages("RSocrata")
+
+library("RSocrata")
+
+# df <- read.socrata(
+#     "https://data.cdc.gov/resource/9mfq-cb36.json",
+#     app_token = "EBMs4oKetmLbVamIOVl7e9bP3",
+#     email     = "bhe@nyit.edu",
+#     password  = "Ilovecoding1"
+# )
+
+
+
+
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
+ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
+                 #########page 1##########
+                 tabPanel("Page 1",
+                    fluidPage(
+                
+                    # Application title
+                    titlePanel("Old Faithful Geyser Data"),
+                
+                    # Sidebar with a slider input for number of bins 
+                    sidebarLayout(
+                        sidebarPanel(
+                            sliderInput("bins",
+                                        "Number of bins:",
+                                        min = 1,
+                                        max = 50,
+                                        value = 30)
+                        ),
+                
+                        # Show a plot of the generated distribution
+                        mainPanel(
+                           plotOutput("distPlot")
+                        )
+                    )
+                )
+                ),    
+                #########page 2##########
+                tabPanel("Page 2",
+                         
+                         # Show a plot of the generated distribution
+                         mainPanel(
+                             plotOutput("distPlot")
+                         )
+                ),
+                
+                #########page 3##########
+                tabPanel("Page 3",
+                         
+                         # Show a plot of the generated distribution
+                         mainPanel(
+                             plotOutput("distPlot")
+                         )
+                ),
+                         
+                
 )
-
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
