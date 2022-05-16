@@ -14,14 +14,16 @@ library(shiny)
 
 library("RSocrata")
 
-# df <- read.socrata(
-#     "https://data.cdc.gov/resource/9mfq-cb36.json",
-#     app_token = "EBMs4oKetmLbVamIOVl7e9bP3",
-#     email     = "bhe@nyit.edu",
-#     password  = "Ilovecoding1"
-# )
+df <- read.socrata(
+    "https://data.cdc.gov/resource/9mfq-cb36.json",
+    app_token = "EBMs4oKetmLbVamIOVl7e9bP3",
+    email     = "bhe@nyit.edu",
+    password  = "Ilovecoding1"
+)
 
 library(DT) # library to display datatable
+library(leaflet) # interactive map function
+
 
 
 # Define UI for application that draws a histogram
@@ -50,6 +52,12 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                     )
                 )
                 ),    
+                #########page Read Me##########
+                tabPanel("Interactive Map",
+                         fluidPage(
+                             leafletOutput("covidmap", width=2000, height=1000)
+                         )
+                ),
                 #########page 2##########
                 tabPanel("The Datasets",
                          h2("The CDC data"),
@@ -63,7 +71,7 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                 
 )
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
 
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
@@ -76,6 +84,14 @@ server <- function(input, output) {
         # render the table set 
         output$mytable = DT::renderDataTable({
             df
+        })
+        
+        # render interactive map
+        output$covidmap <- renderLeaflet({
+            leaflet() %>%
+                addTiles() %>%
+                setView(lng = -93.85, lat = 37.45, zoom = 4)
+            # generate the map
         })
     })
 }
