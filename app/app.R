@@ -24,7 +24,8 @@ df <- read.socrata(
 library(DT) # library to display datatable
 library(leaflet) # interactive map function
 
-
+library(usmap)
+library(ggplot2)
 
 # Define UI for application that draws a histogram
 ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
@@ -33,26 +34,22 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                     fluidPage(
                 
                     # Application title
-                    titlePanel("Old Faithful Geyser Data"),
+                    titlePanel("US Covid Data"),
                 
-                    # Sidebar with a slider input for number of bins 
-                    sidebarLayout(
-                        sidebarPanel(
-                            sliderInput("bins",
-                                        "Number of bins:",
-                                        min = 1,
-                                        max = 50,
-                                        value = 30)
-                        ),
                 
                         # Show a plot of the generated distribution
                         mainPanel(
                            plotOutput("distPlot")
                         )
                     )
-                )
-                ),    
-                #########page Read Me##########
+                ),
+
+                #########us covid Map##########
+                tabPanel("US Covid-19 Map",
+                         ),
+                
+                
+                #########page Interactive Map##########
                 tabPanel("Interactive Map",
                          div(class="outer",
                              
@@ -83,20 +80,15 @@ ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
                 #########page Read Me##########
                 tabPanel("Read Me",includeMarkdown("../readme.md")
                 ),
-                         
-                
-)
+        )
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
     output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
         # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-        
+        hist(as.numeric(df[,2]), col = 'darkgray', border = 'white')
+    })
         # render the table set 
         output$mytable = DT::renderDataTable({
             df
@@ -106,11 +98,13 @@ server <- function(input, output, session) {
         output$covidmap <- renderLeaflet({
             leaflet() %>%
                 addTiles() %>%
-                setView(lng = -93.85, lat = 37.45, zoom = 4)
+                setView(lng = -93.85, lat = 37.45, zoom = 5)
             # generate the map
         })
-    })
-}
+        
+        # render us covid map
+
+    }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
