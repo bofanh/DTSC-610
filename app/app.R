@@ -12,63 +12,29 @@ library(shiny)
 ## Install the required package with:
 ## install.packages("RSocrata")
 
-library("RSocrata")
 
-df <- read.socrata(
-    "https://data.cdc.gov/resource/9mfq-cb36.json",
-    app_token = "EBMs4oKetmLbVamIOVl7e9bP3",
-    email     = "bhe@nyit.edu",
-    password  = "Ilovecoding1"
-)
+
+##################new data
+library(dplyr)
 
 library(DT) # library to display datatable
-library(leaflet) # interactive map function
 
-library(usmap)
 library(ggplot2)
+
+
+
+
 
 # Define UI for application that draws a histogram
 ui <- navbarPage(title = "DTSC 610 - M01/Spring 2022",
-                 #########page 1##########
-                 tabPanel("Page 1",
-                    fluidPage(
-                
-                    # Application title
-                    titlePanel("US Covid Data"),
-                
-                
-                        # Show a plot of the generated distribution
-                        mainPanel(
-                           plotOutput("distPlot")
-                        )
-                    )
-                ),
 
-                #########us covid Map##########
-                tabPanel("US Covid-19 Map",
-                         ),
-                
-                
-                #########page Interactive Map##########
-                tabPanel("Interactive Map",
-                         div(class="outer",
-                             
-                             tags$head(
-                                 # Include our custom CSS
-                                 includeCSS("styles.css"),
-                             ),
-                             
-                             leafletOutput("covidmap", width="100%", height="100%"),
-                             
-                             # Shiny versions prior to 0.11 should use class = "modal" instead.
-                             absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                           draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
-                                           width = 330, height = "auto",
-                                           
-                                           h3("COVID-19 explorer"),
-                                           )
-                        
-                ),
+                #########Static Plots##########
+                tabPanel("Static Plots",
+                         plotOutput("statenewcasetoday"),
+                         plotOutput("statenewdeathtoday"),
+                         plotOutput("statestotcase"),
+                         plotOutput("statestotcase2"),
+                         plotOutput("statestotcase3"),
                 ),
                 
                 #########page 2##########
@@ -93,16 +59,65 @@ server <- function(input, output, session) {
         output$mytable = DT::renderDataTable({
             df
         })
+        # render today's data
+        tdata <- read.csv(file = 'today_dataframe.csv')
         
-        # render interactive map
-        output$covidmap <- renderLeaflet({
-            leaflet() %>%
-                addTiles() %>%
-                setView(lng = -93.85, lat = 37.45, zoom = 5)
-            # generate the map
+        output$statenewdeathtoday = renderPlot({
+            ggplot(tdata, aes(state, new_death, size = tot_death,)) + 
+                geom_point(alpha=0.7) +
+                scale_size(range = c(.1, 16), name="Total Death")+
+                ylab("Number of New Death") +
+                xlab("State")
+                
+        })
+        # New Cases
+        output$statenewcasetoday = renderPlot({
+            ggplot(tdata, aes(state, new_case, size = tot_cases,)) + 
+                geom_point(alpha=0.7) +
+                scale_size(range = c(.1, 16), name="Total Cases")+
+                ylab("Number of New Cases") +
+                xlab("State")+
+                theme_bw()
         })
         
-        # render us covid map
+        # different states
+        adata <- read.csv(file = 'all_dataframe.csv')
+        
+        output$statestotcase = renderPlot({
+            ggplot(adata, aes(submission_date, tot_cases,  group=state, color =state )) +
+                geom_line() +
+                theme(axis.text.x=element_blank(), #remove x axis labels
+                      axis.ticks.x=element_blank(), #remove x axis ticks
+                ) +
+                xlab("From 2019 to Present") + 
+                labs(title = "Total Case Trend")+
+                ylab("Daily Total Cases")
+        })
+        
+        # different states
+        output$statestotcase2 = renderPlot({
+            ggplot(adata, aes(submission_date, new_case,  group=state, color =state )) +
+                geom_line() +
+                theme(axis.text.x=element_blank(), #remove x axis labels
+                      axis.ticks.x=element_blank(), #remove x axis ticks
+                ) +
+                xlab("From 2019 to Present") + 
+                ylab("Daily New Cases") +
+                labs(title = "New Case Trend")
+            
+        })
+        
+        # different states
+        output$statestotcase3 = renderPlot({
+            ggplot(adata, aes(state, new_case,  fill=state )) +
+                geom_line() +
+                geom_bar(stat="identity", width=1) +
+                coord_polar("y", start=0)+
+                theme(axis.text.y=element_blank(), #remove x axis labels
+                      axis.ticks.y=element_blank(), #remove x axis ticks
+                ) 
+            
+        })
 
     }
 
